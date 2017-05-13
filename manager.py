@@ -17,6 +17,7 @@ class SSHConnect(object):
         out = ''
         for line in stdout:
             out += line;
+        print out
         return out
 
 event = sched.scheduler(time.time, time.sleep)
@@ -30,7 +31,7 @@ def one_host_seq_exe(host):
     connect = SSHConnect(host['ip'], host['username'], host['password'])
     for command in host['command_list']:
         event.enter(0, 0, connect.exe_command, (command,))
-        result = event.run()
+        event.run()
 
 def one_host_concurrent_exe(host):
     """
@@ -46,7 +47,7 @@ def multi_host_seq_exe(host):
     give the host dictionarary and command_list to execute.
     """
     for host_node in host:
-        connect = SSHConnect(host['ip'], host['username'], host['password'])
+        connect = SSHConnect(host_node['ip'], host_node['username'], host_node['password'])
         for command in host_node['command_list']:
             event.enter(0, 0, connect.exe_command, (command,))
             event.run()
@@ -56,7 +57,7 @@ def multi_host_concurrent_exe(host):
     give the host dictionarary and command_list to execute.
     """
     for host_node in host:
-        connect = SSHConnect(host[ip], host[username], host[password])
+        connect = SSHConnect(host_node['ip'], host_node['username'], host_node['password'])
         for command in host_node['command_list']:
             event.enter(1, 0, connect.exe_command, (command,))
     event.run()
@@ -70,8 +71,6 @@ if __name__ == '__main__':
     node_list4 = [{'ip': '192.168.102.129', 'username': 'root', 'password': 'fanghao', 'command_list': ['echo hello',]}, {'ip': '192.168.102.132',
     'username': 'root', 'password': 'fanghao', 'command_list': ['echo hello world',]}]
     
-    import pdb
-    pdb.set_trace()
     one_host_seq_exe(node_list1)
     one_host_concurrent_exe(node_list2)
     multi_host_seq_exe(node_list3)
